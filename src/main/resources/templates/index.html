@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>insert title here</title>
+<script src="./js/jquery-3.4.1.min.js"></script>
+</head>
+<body>
+欢迎进入登录页！index.html
+	<button onclick="linkto()">跳转到用户信息页</button>
+	<script>
+		function linkto(id){
+			window.location.href="/sysuser/sysuserlist?id="+ id ;
+		}
+	</script>
+	<button onclick="getUser('0001')">zhangsan</button>
+	<button onclick="getUser('0002')">lisi</button>
+	<table id = "userlist"  border = "1" cellpadding = "5" cellspacing = "0">
+	</br>
+	ID:<input class = "user_id" type = "text" placeholder = "请输入ID"></br>
+	用户名：<input class = "user_name" type = "text" placeholder = "请输入用户名"></br>
+	密&nbsp&nbsp&nbsp码：<input class  = "user_password" type = "text" placeholder = "请输入密码"></br>
+	<button onclick = "submit()">注册 </button>
+	</table>
+	<script>
+		function getUser(id){
+			$.ajax({
+				type:"get",
+				url:"/sysuser/getuserlist",
+				data:{
+					id:id,
+				},
+				dataType:"json",
+				success:function(data){
+					console.log("成功返回的数据",data);
+					var userList = data.userList;
+					$("#userlist").html("");
+					var txt = "";
+					for(var i = 0; i < userList.length; i ++){
+						txt += `<tr>
+							<td>${userList[i].id}</td>
+							<td>${userList[i].username}</td>
+							<td>${userList[i].password}</td>
+							<td>${userList[i].ts}</td>
+							<td><button onclick = "delUser('${userList[i].id}')">删除</button></td>
+						</tr>`
+						}
+					console.log(txt);
+					var tbody = $("<tbody></tbody>").html(txt);
+					$("#userlist").html(tbody);
+				},
+				error:function(data){
+					console.log("失败后返回的数据",data);
+				}
+			})
+		}
+		
+		function submit(){
+			var id = $(".user_id").val();
+			var username = $(".user_name").val();
+			var password = $(".user_password").val();
+			console.log(id, username, password);
+			
+			 $.ajax({
+				type:"post",
+				url:"/sysuser/userregister",
+				data:{
+					id:id,
+					username:username,
+					password:password,
+				}, 
+				dataType:"json",
+				success:function(data){
+					console.log("成功返回的数据",data);
+					alert(data.msg);
+				
+				},
+				error:function(data){
+					console.log("失败后返回的数据",data);
+				}
+			})
+			 
+		}
+		
+		function delUser(id){
+			console.log("删除",id);
+			 $.ajax({
+					type:"post",
+					url:"/sysuser/userdelete",
+					data:{
+						id:id,
+					}, 
+					dataType:"json",
+					success:function(data){
+						console.log("成功返回的数据",data);
+						if(data.code == 1){
+							$.ajax({
+								type:"get",
+								url:"/sysuser/getuserlist",
+								/* data:{
+									id:id,
+								}, */
+								dataType:"json",
+								success:function(data){
+									console.log("成功返回的数据",data);
+									
+									var userList = data.userList;
+									$("#userlist").html("");
+									var txt = "";
+									for(var i = 0; i < userList.length; i ++){
+										txt += `<tr>
+											<td>${userList[i].id}</td>
+											<td>${userList[i].username}</td>
+											<td>${userList[i].password}</td>
+											<td>${userList[i].ts}</td>
+											<td><button onclick = "delUser('${userList[i].id}')">删除</button></td>
+										</tr>`
+										}
+									console.log(txt);
+									var tbody = $("<tbody></tbody>").html(txt);
+									$("#userlist").html(tbody);
+								},
+								error:function(data){
+									console.log("失败后返回的数据",data);
+								}
+							})
+						}
+					},
+					error:function(data){
+						console.log("失败后返回的数据",data);
+					}
+				})
+		}
+		
+		$(function(){
+			$.ajax({
+				type:"get",
+				url:"/sysuser/getuserlist",
+				/* data:{
+					id:id,
+				}, */
+				dataType:"json",
+				success:function(data){
+					console.log("成功返回的数据",data);
+					
+					var userList = data.userList;
+					$("#userlist").html("");
+					var txt = "";
+					for(var i = 0; i < userList.length; i ++){
+						txt += `<tr>
+							<td>${userList[i].id}</td>
+							<td>${userList[i].username}</td>
+							<td>${userList[i].password}</td>
+							<td>${userList[i].ts}</td>
+							<td><button onclick = "delUser('${userList[i].id}')">删除</button></td>
+						</tr>`
+						}
+					console.log(txt);
+					var tbody = $("<tbody></tbody>").html(txt);
+					$("#userlist").html(tbody);
+				},
+				error:function(data){
+					console.log("失败后返回的数据",data);
+				}
+			})
+			
+		})
+	</script>
+			
+</body>
+</html>
